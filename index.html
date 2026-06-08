@@ -6,39 +6,39 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="theme-color" content="#ffffff">
-    
+
     <title>₹ Tracker App</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
+
     <style>
         :root {
             --primary: #4f46e5; --primary-hover: #4338ca; --success: #10b981; --success-hover: #059669;
             --danger: #ef4444; --warning: #f59e0b; --bg-color: #f3f4f6; --card-bg: #ffffff;
-            --text-main: #111827; --text-muted: #6b7280; --border-color: #e5e7eb; 
+            --text-main: #111827; --text-muted: #6b7280; --border-color: #e5e7eb;
             --nav-height: 70px;
         }
-        
-        body { 
-            font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main); 
-            margin: 0; padding: 0; display: flex; flex-direction: column; 
+
+        body {
+            font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main);
+            margin: 0; padding: 0; display: flex; flex-direction: column;
             height: 100vh; height: 100dvh; /* Use dynamic viewport height for mobile browsers */
-            overflow: hidden; 
+            overflow: hidden;
         }
 
         /* --- Header Top Bar --- */
-        header { 
-            background-color: var(--card-bg); height: 60px; border-bottom: 1px solid var(--border-color); 
-            display: flex; align-items: center; justify-content: center; 
+        header {
+            background-color: var(--card-bg); height: 60px; border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: center;
             padding: env(safe-area-inset-top) 20px 0 20px; flex-shrink: 0;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05); z-index: 10;
         }
         .logo { font-size: 18px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 8px; }
 
         /* --- Main Scrollable Area --- */
-        .main-container { 
-            flex: 1; overflow-y: auto; padding: 15px 15px calc(var(--nav-height) + 20px) 15px; 
-            -webkit-overflow-scrolling: touch; 
+        .main-container {
+            flex: 1; overflow-y: auto; padding: 15px 15px calc(var(--nav-height) + 20px) 15px;
+            -webkit-overflow-scrolling: touch;
         }
 
         .view-section { display: none; animation: fadeIn 0.2s ease; }
@@ -60,7 +60,7 @@
         .nav-item svg { margin-bottom: 4px; stroke-width: 2; width: 24px; height: 24px; }
         .nav-item.active { color: var(--primary); }
         .nav-item.active svg { stroke-width: 2.5; }
-        
+
         /* Floating Action Button (FAB) look for Add */
         .nav-item.fab-btn svg {
             background: var(--primary); color: white; border-radius: 50%; padding: 8px;
@@ -72,7 +72,7 @@
         .card { background-color: var(--card-bg); border-radius: 16px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid var(--border-color); position: relative; margin-bottom: 15px;}
         .card-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;}
         h2 { font-size: 18px; font-weight: 600; margin: 0; }
-        
+
         /* Mobile Form Adjustments */
         .form-group { display: flex; flex-direction: column; gap: 12px; }
         label { font-size: 13px; font-weight: 500; color: var(--text-muted); margin-bottom: 4px; display: block; }
@@ -80,7 +80,7 @@
         /* Larger inputs for fat fingers */
         input, select { width: 100%; padding: 14px 12px; font-size: 16px; font-family: 'Inter', sans-serif; border: 1px solid var(--border-color); border-radius: 10px; box-sizing: border-box; background-color: #f9fafb; -webkit-appearance: none;}
         input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2); background-color: #fff; }
-        
+
         .form-actions { display: flex; gap: 10px; margin-top: 15px; }
         button { cursor: pointer; font-weight: 600; font-family: 'Inter', sans-serif; border-radius: 12px; border: none; padding: 16px; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; }
         .add-btn { background-color: var(--primary); color: white; }
@@ -91,8 +91,8 @@
 
         /* --- Transaction Cards (Replacing the Table) --- */
         .tx-list { display: flex; flex-direction: column; gap: 12px; }
-        .tx-card { 
-            background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; 
+        .tx-card {
+            background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px;
             padding: 15px; display: flex; flex-direction: column; gap: 10px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.02);
         }
@@ -101,13 +101,13 @@
         .tx-amount { font-weight: 700; font-size: 16px; color: var(--text-main); }
         .tx-meta { font-size: 12px; color: var(--text-muted); display: flex; flex-wrap: wrap; gap: 6px; align-items: center;}
         .tx-bottom { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 10px; margin-top: 5px;}
-        
+
         /* Pills inside cards */
         .tx-pill { background: var(--bg-color); padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 500; color: var(--text-muted);}
         .tx-pill.cat { background-color: #f3e8ff; color: #7e22ce; }
         .tx-pill.src { background-color: #ffedd5; color: #c2410c; }
         .tx-pill.tag { background-color: #e0f2fe; color: #0369a1; }
-        
+
         /* Icon buttons in cards */
         .tx-actions { display: flex; gap: 10px; }
         .tx-btn { background: none; border: none; padding: 5px; color: var(--text-muted); border-radius: 6px; width: auto; }
@@ -134,7 +134,7 @@
         .bar-bg { width: 100%; height: 8px; background-color: var(--bg-color); border-radius: 4px; overflow: hidden; }
         .bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease-out; }
         .empty-state { text-align: center; padding: 30px 20px; color: var(--text-muted); font-size: 14px; }
-        
+
         /* Loader Overlay */
         .loading-overlay { display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.8); z-index: 10; align-items: center; justify-content: center; font-weight: bold; color: var(--primary); border-radius: 16px; flex-direction: column; gap: 10px;}
         .loading-overlay.active { display: flex; }
@@ -152,7 +152,7 @@
 <div class="main-container">
 
     <div id="history-view" class="view-section active">
-        
+
         <div class="sticky-summary">
             <h3>Total Spent</h3>
             <p class="huge-amount" id="totalAmount">₹0.00</p>
@@ -168,7 +168,7 @@
         </div>
 
         <div id="tableLoader" class="loading-overlay" style="position:fixed; z-index:999;"><span id="loaderText">Syncing...</span></div>
-        
+
         <div class="tx-list" id="expenseBody">
             </div>
     </div>
@@ -189,7 +189,7 @@
                     <datalist id="labelList"></datalist>
                 </div>
                 <div class="input-wrap"><label>Tags (Optional)</label><input type="text" id="tags" placeholder="e.g., trip, food"></div>
-                
+
                 <div class="form-actions">
                     <button type="submit" id="submitBtn" class="add-btn">
                         <span id="submitBtnText">Save Expense</span>
@@ -245,11 +245,7 @@
     // ==========================================
     // SUPABASE CONFIGURATION (REQUIRED)
     // ==========================================
-    const SUPABASE_URL = 'https://ufvpmsnbtdxxikvtnvtv.supabase.co';
-    const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY_HERE'; // <-- PASTE KEY HERE
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    // ==========================================
-
+    let supabaseClient;
     let expenses = []; 
     let currentEditId = null; 
     
@@ -263,13 +259,25 @@
     const loaderText = document.getElementById('loaderText');
 
     // ==========================================
-    // INITIALIZATION 
+    // INITIALIZATION
     // ==========================================
     async function initApp() {
-        // If testing locally without Vercel config API, it uses hardcoded keys above
-        document.getElementById('date').valueAsDate = new Date();
-        await fetchDropdownData();
-        await fetchExpenses();
+        try {
+            // Fetch credentials dynamically from Vercel API Route
+            const response = await fetch('/api/config');
+            if (!response.ok) throw new Error("Failed to fetch config");
+
+            const config = await response.json();
+            supabaseClient = supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+             document.getElementById('date').valueAsDate = new Date();
+
+            // Pull initial configurations and data from database
+            await fetchDropdownData();
+            await fetchExpenses();
+        } catch (error) {
+            console.error(error);
+            alert("Application failed to initialize. Please verify your Vercel Environment Variables and /api config.js setup.");
+        }
     }
 
     // ==========================================
@@ -350,7 +358,7 @@
                     
                     if (!error) array.push(trimmed);
                 }
-                
+
                 populateDropdowns();
                 e.target.value = trimmed;
             } else { e.target.value = ""; }
@@ -399,9 +407,9 @@
             if (!error) cancelEdit(); else alert("Error updating.");
         } else {
             const { error } = await supabaseClient.from('expenses').insert([expensePayload]);
-            if (!error) { 
-                form.reset(); 
-                document.getElementById('date').valueAsDate = new Date(); 
+            if (!error) {
+                form.reset();
+                document.getElementById('date').valueAsDate = new Date();
                 switchTab('history'); // Automatically jump back to list after saving
             } else alert("Error saving.");
         }
@@ -432,7 +440,7 @@
 
         expenses.forEach(exp => {
             total += Number(exp.amount);
-            
+
             // Build visual tags
             let pillsHtml = '';
             if (exp.category) pillsHtml += `<span class="tx-pill cat">${exp.category}</span>`;
@@ -458,7 +466,7 @@
                     </div>
                     <div class="tx-amount">₹${Number(exp.amount).toLocaleString('en-IN', {minimumFractionDigits: 2})}</div>
                 </div>
-                
+
                 <div class="tx-meta" style="margin-top: 2px;">
                     ${pillsHtml}
                 </div>
@@ -482,19 +490,19 @@
     function editExpense(id) {
         const exp = expenses.find(e => e.id === id);
         if (!exp) return;
-        
+
         ['date','description','amount','category','source','tags'].forEach(k => {
             const el = document.getElementById(k === 'description' ? 'desc' : k);
             if(el) el.value = exp[k] || '';
         });
         document.getElementById('labelInput').value = exp.label || '';
-        
+
         currentEditId = id;
         document.getElementById('formTitle').textContent = "Edit Expense";
         document.getElementById('submitBtn').classList.add('edit-mode');
         document.getElementById('submitBtnText').textContent = "Update Expense";
         document.getElementById('cancelEditBtn').style.display = 'block';
-        
+
         switchTab('add'); // Automatically jump to the Add Form tab
     }
 
@@ -603,16 +611,16 @@
         document.getElementById('reportEndDate').value = lastDay.toISOString().split('T')[0];
     }
     function resetReportDates() { document.getElementById('reportStartDate').value = ''; document.getElementById('reportEndDate').value = ''; generateReports(); }
-    
+
     function generateReports() {
         const start = document.getElementById('reportStartDate').value, end = document.getElementById('reportEndDate').value;
         let filteredData = expenses;
         if (start) filteredData = filteredData.filter(e => e.date >= start);
         if (end) filteredData = filteredData.filter(e => e.date <= end);
-        
+
         const total = filteredData.reduce((sum, e) => sum + Number(e.amount), 0);
         document.getElementById('reportTotalAmount').textContent = `₹${total.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
-        
+
         const byCategory = {}, bySource = {}, byLabel = {};
         filteredData.forEach(exp => {
             const amt = Number(exp.amount);
@@ -620,12 +628,12 @@
             bySource[exp.source || 'Unknown'] = (bySource[exp.source || 'Unknown'] || 0) + amt;
             byLabel[exp.label || 'No Label'] = (byLabel[exp.label || 'No Label'] || 0) + amt;
         });
-        
+
         renderBreakdown('categoryReport', byCategory, total, ['#8b5cf6', '#a78bfa', '#c4b5fd']);
         renderBreakdown('sourceReport', bySource, total, ['#f97316', '#fb923c', '#fdba74']);
         renderBreakdown('labelReport', byLabel, total, ['#10b981', '#34d399', '#6ee7b7']);
     }
-    
+
     function renderBreakdown(containerId, dataObj, total, colors) {
         const container = document.getElementById(containerId);
         if (Object.keys(dataObj).length === 0 || total === 0) return container.innerHTML = '<div class="empty-state">No data available.</div>';
