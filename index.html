@@ -5,47 +5,126 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="theme-color" content="#ffffff">
-
-    <title>₹ Tracker App</title>
+    <title>₹ Tracker Pro</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
+    
     <style>
         :root {
             --primary: #4f46e5; --primary-hover: #4338ca; --success: #10b981; --success-hover: #059669;
             --danger: #ef4444; --warning: #f59e0b; --bg-color: #f3f4f6; --card-bg: #ffffff;
-            --text-main: #111827; --text-muted: #6b7280; --border-color: #e5e7eb;
-            --nav-height: 70px;
+            --text-main: #111827; --text-muted: #6b7280; --border-color: #e5e7eb; 
+            --header-height: 60px; --nav-height: 70px;
         }
-
-        body {
-            font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main);
-            margin: 0; padding: 0; display: flex; flex-direction: column;
-            height: 100vh; height: 100dvh; /* Use dynamic viewport height for mobile browsers */
-            overflow: hidden;
+        
+        body { 
+            font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main); 
+            margin: 0; padding: 0; display: flex; flex-direction: column; 
+            height: 100vh; height: 100dvh; overflow: hidden; 
         }
 
         /* --- Header Top Bar --- */
-        header {
-            background-color: var(--card-bg); height: 60px; border-bottom: 1px solid var(--border-color);
-            display: flex; align-items: center; justify-content: center;
+        header { 
+            background-color: var(--card-bg); height: var(--header-height); border-bottom: 1px solid var(--border-color); 
+            display: flex; align-items: center; justify-content: space-between; 
             padding: env(safe-area-inset-top) 20px 0 20px; flex-shrink: 0;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05); z-index: 10;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05); z-index: 100;
         }
-        .logo { font-size: 18px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+        .header-content { display: flex; justify-content: space-between; width: 100%; max-width: 1400px; margin: 0 auto; align-items: center;}
+        .logo { font-size: 20px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+        
+        .desktop-tabs { display: none; gap: 10px; }
+        .tab-btn { background: none; border: none; padding: 8px 16px; font-size: 15px; font-weight: 600; color: var(--text-muted); cursor: pointer; border-radius: 6px; transition: all 0.2s; }
+        .tab-btn:hover { background-color: var(--bg-color); color: var(--text-main); }
+        .tab-btn.active { background-color: #e0e7ff; color: var(--primary); }
 
         /* --- Main Scrollable Area --- */
-        .main-container {
-            flex: 1; overflow-y: auto; padding: 15px 15px calc(var(--nav-height) + 20px) 15px;
-            -webkit-overflow-scrolling: touch;
+        main { 
+            flex: 1; overflow-y: auto; padding: 20px; 
+            -webkit-overflow-scrolling: touch; width: 100%; max-width: 1400px; margin: 0 auto; box-sizing: border-box;
         }
 
-        .view-section { display: none; animation: fadeIn 0.2s ease; }
-        .view-section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .card { background-color: var(--card-bg); border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border-color); position: relative; margin-bottom: 20px;}
+        .card-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;}
+        h2 { font-size: 18px; font-weight: 600; margin: 0; }
+        
+        /* --- Forms & Inputs --- */
+        .form-group { display: flex; flex-direction: column; gap: 12px; }
+        label { font-size: 13px; font-weight: 500; color: var(--text-muted); margin-bottom: 4px; display: block; }
+        .input-wrap { margin-bottom: 5px; }
+        input, select { width: 100%; padding: 12px; font-size: 16px; font-family: 'Inter', sans-serif; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: #f9fafb; -webkit-appearance: none;}
+        input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2); background-color: #fff; }
+        
+        .form-actions { display: flex; gap: 10px; margin-top: 10px; }
+        button { cursor: pointer; font-weight: 600; font-family: 'Inter', sans-serif; border-radius: 8px; border: none; padding: 14px; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; transition: all 0.2s;}
+        .add-btn { background-color: var(--success); color: white; }
+        .add-btn:hover { background-color: var(--success-hover); }
+        .add-btn.edit-mode { background-color: var(--warning); }
+        .cancel-btn { background-color: #e5e7eb; color: var(--text-main); display: none; }
+        .action-btns-mini { display: flex; gap: 8px; }
+        .btn-mini { padding: 8px 12px; font-size: 13px; border-radius: 6px; width: auto; background: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-color);}
+        
+        /* --- Pill Badges --- */
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; display: inline-block; }
+        .badge-category { background-color: #f3e8ff; color: #7e22ce; }
+        .badge-source { background-color: #ffedd5; color: #c2410c; }
+        .badge-label { background-color: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .tag-pill { background-color: #e0f2fe; color: #0369a1; padding: 3px 8px; border-radius: 6px; font-size: 11px; margin-right: 4px; display: inline-block; }
 
-        /* --- App-Style Bottom Navigation --- */
+        /* --- Desktop Table --- */
+        .desktop-table-container { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border-color); display: none; }
+        table { width: 100%; border-collapse: collapse; white-space: nowrap; }
+        th { background-color: #f9fafb; color: var(--text-muted); font-weight: 600; font-size: 12px; text-transform: uppercase; padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        th.right-align, td.right-align { text-align: right; }
+        td { padding: 14px 16px; border-bottom: 1px solid var(--border-color); font-size: 14px; }
+        tr:hover td { background-color: #f9fafb; }
+        .amount-text { font-weight: 600; }
+        .total-row { background-color: #f9fafb; font-weight: 700; font-size: 16px; }
+
+        /* --- Mobile Cards --- */
+        .mobile-cards-container { display: flex; flex-direction: column; gap: 12px; }
+        .tx-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        .tx-top { display: flex; justify-content: space-between; align-items: flex-start; }
+        .tx-title { font-weight: 600; font-size: 15px; color: var(--text-main); margin-bottom: 4px;}
+        .tx-amount { font-weight: 700; font-size: 16px; color: var(--text-main); }
+        .tx-meta { font-size: 12px; color: var(--text-muted); display: flex; flex-wrap: wrap; gap: 6px; align-items: center;}
+        .tx-bottom { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 10px; margin-top: 5px;}
+        .tx-actions { display: flex; gap: 10px; }
+        .tx-btn { background: none; border: none; padding: 5px; color: var(--text-muted); border-radius: 6px; width: auto; }
+        .tx-btn.edit { color: var(--primary); }
+        .tx-btn.delete { color: var(--danger); }
+
+        /* --- Shared Action Buttons --- */
+        .action-cell { display: flex; gap: 8px; justify-content: center; }
+        .action-btn { padding: 8px; border-radius: 6px; background-color: transparent; }
+        .edit-btn { color: var(--primary); border: 1px solid var(--primary); width: auto;}
+        .edit-btn:hover { background-color: var(--primary); color: white; }
+        .delete-btn { color: var(--danger); border: 1px solid var(--danger); width: auto;}
+        .delete-btn:hover { background-color: var(--danger); color: white; }
+
+        /* --- Reports --- */
+        .report-filters { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;}
+        .filter-group { flex: 1; min-width: 120px;}
+        .report-summary-card { background: linear-gradient(135deg, var(--primary), #818cf8); color: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); text-align: center;}
+        .report-summary-card h3 { margin: 0 0 5px 0; font-size: 14px; font-weight: 500; opacity: 0.9; }
+        .report-summary-card .huge-amount { font-size: 32px; font-weight: 700; margin: 0; }
+        .report-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        .breakdown-item { margin-bottom: 12px; }
+        .breakdown-header { display: flex; justify-content: space-between; font-size: 13px; font-weight: 500; margin-bottom: 5px;}
+        .bar-bg { width: 100%; height: 8px; background-color: var(--bg-color); border-radius: 4px; overflow: hidden; }
+        .bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease-out; }
+        .empty-state { text-align: center; padding: 30px 20px; color: var(--text-muted); font-size: 14px; }
+
+        /* --- Loaders --- */
+        .loading-overlay { display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.8); z-index: 10; align-items: center; justify-content: center; font-weight: bold; color: var(--primary); border-radius: 12px; flex-direction: column; gap: 10px;}
+        .loading-overlay.active { display: flex; }
+
+        /* =====================================================================
+           RESPONSIVE STATE MANAGEMENT (THE MAGIC)
+           ===================================================================== */
+        
+        /* Mobile Default State (Small Screens) */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0; height: calc(var(--nav-height) + env(safe-area-inset-bottom));
             background: var(--card-bg); border-top: 1px solid var(--border-color);
@@ -59,124 +138,72 @@
         }
         .nav-item svg { margin-bottom: 4px; stroke-width: 2; width: 24px; height: 24px; }
         .nav-item.active { color: var(--primary); }
-        .nav-item.active svg { stroke-width: 2.5; }
+        .nav-item.fab-btn svg { background: var(--primary); color: white; border-radius: 50%; padding: 8px; width: 24px; height: 24px; margin-bottom: 2px; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.4); }
 
-        /* Floating Action Button (FAB) look for Add */
-        .nav-item.fab-btn svg {
-            background: var(--primary); color: white; border-radius: 50%; padding: 8px;
-            width: 24px; height: 24px; margin-bottom: 2px; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.4);
+        /* View Toggling on Mobile */
+        body.state-history .form-card { display: none; }
+        body.state-history .history-card { display: block; }
+        body.state-history .reports-view { display: none; }
+        
+        body.state-add .form-card { display: block; }
+        body.state-add .history-card { display: none; }
+        body.state-add .reports-view { display: none; }
+
+        body.state-reports .transactions-wrapper { display: none; }
+        body.state-reports .reports-view { display: block; }
+
+        .desktop-only { display: none !important; }
+
+        /* Desktop Override (Large Screens) */
+        @media (min-width: 768px) {
+            main { padding: 30px 20px; }
+            .desktop-tabs { display: flex; }
+            .bottom-nav { display: none; }
+            .mobile-only { display: none !important; }
+            .desktop-only { display: block !important; }
+            
+            /* Show Desktop Table, Hide Mobile Cards */
+            .desktop-table-container { display: block; }
+            .mobile-cards-container { display: none; }
+            .report-grid { grid-template-columns: 1fr 1fr; } /* 2 cols on desktop */
+
+            /* Force Grid Layout for Transactions */
+            .transactions-wrapper { display: grid; grid-template-columns: 350px 1fr; gap: 20px; }
+            
+            /* Desktop ignores mobile state hiding for Form and History */
+            body.state-history .transactions-wrapper,
+            body.state-add .transactions-wrapper { display: grid; }
+            body.state-history .form-card, body.state-history .history-card,
+            body.state-add .form-card, body.state-add .history-card { display: block; }
+            body.state-history .reports-view, body.state-add .reports-view { display: none; }
+
+            /* Reports State applies to desktop normally */
+            body.state-reports .transactions-wrapper { display: none; }
+            body.state-reports .reports-view { display: block; }
         }
-        .nav-item.fab-btn.active svg { background: var(--primary-hover); transform: scale(1.05); }
-
-        /* --- UI Components --- */
-        .card { background-color: var(--card-bg); border-radius: 16px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid var(--border-color); position: relative; margin-bottom: 15px;}
-        .card-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;}
-        h2 { font-size: 18px; font-weight: 600; margin: 0; }
-
-        /* Mobile Form Adjustments */
-        .form-group { display: flex; flex-direction: column; gap: 12px; }
-        label { font-size: 13px; font-weight: 500; color: var(--text-muted); margin-bottom: 4px; display: block; }
-        .input-wrap { margin-bottom: 5px; }
-        /* Larger inputs for fat fingers */
-        input, select { width: 100%; padding: 14px 12px; font-size: 16px; font-family: 'Inter', sans-serif; border: 1px solid var(--border-color); border-radius: 10px; box-sizing: border-box; background-color: #f9fafb; -webkit-appearance: none;}
-        input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2); background-color: #fff; }
-
-        .form-actions { display: flex; gap: 10px; margin-top: 15px; }
-        button { cursor: pointer; font-weight: 600; font-family: 'Inter', sans-serif; border-radius: 12px; border: none; padding: 16px; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; }
-        .add-btn { background-color: var(--primary); color: white; }
-        .add-btn.edit-mode { background-color: var(--warning); }
-        .cancel-btn { background-color: #e5e7eb; color: var(--text-main); display: none; }
-        .action-btns-mini { display: flex; gap: 8px; }
-        .btn-mini { padding: 8px 12px; font-size: 12px; border-radius: 8px; width: auto; background: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-color);}
-
-        /* --- Transaction Cards (Replacing the Table) --- */
-        .tx-list { display: flex; flex-direction: column; gap: 12px; }
-        .tx-card {
-            background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px;
-            padding: 15px; display: flex; flex-direction: column; gap: 10px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-        }
-        .tx-top { display: flex; justify-content: space-between; align-items: flex-start; }
-        .tx-title { font-weight: 600; font-size: 15px; color: var(--text-main); margin-bottom: 4px;}
-        .tx-amount { font-weight: 700; font-size: 16px; color: var(--text-main); }
-        .tx-meta { font-size: 12px; color: var(--text-muted); display: flex; flex-wrap: wrap; gap: 6px; align-items: center;}
-        .tx-bottom { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 10px; margin-top: 5px;}
-
-        /* Pills inside cards */
-        .tx-pill { background: var(--bg-color); padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 500; color: var(--text-muted);}
-        .tx-pill.cat { background-color: #f3e8ff; color: #7e22ce; }
-        .tx-pill.src { background-color: #ffedd5; color: #c2410c; }
-        .tx-pill.tag { background-color: #e0f2fe; color: #0369a1; }
-
-        /* Icon buttons in cards */
-        .tx-actions { display: flex; gap: 10px; }
-        .tx-btn { background: none; border: none; padding: 5px; color: var(--text-muted); border-radius: 6px; width: auto; }
-        .tx-btn:active { background: var(--bg-color); }
-        .tx-btn.edit { color: var(--primary); }
-        .tx-btn.delete { color: var(--danger); }
-
-        /* Total Summary Sticky Header */
-        .sticky-summary {
-            background: linear-gradient(135deg, var(--primary), #818cf8); color: white;
-            border-radius: 16px; padding: 20px; margin-bottom: 20px;
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
-        }
-        .sticky-summary h3 { margin: 0 0 5px 0; font-size: 14px; font-weight: 500; opacity: 0.9; }
-        .sticky-summary .huge-amount { font-size: 32px; font-weight: 700; margin: 0; }
-
-        /* Reports CSS */
-        .report-filters { display: flex; gap: 10px; margin-bottom: 15px; }
-        .filter-group { flex: 1; }
-        .filter-group input { padding: 10px; font-size: 14px;}
-        .report-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
-        .breakdown-item { margin-bottom: 12px; }
-        .breakdown-header { display: flex; justify-content: space-between; font-size: 13px; font-weight: 500; margin-bottom: 5px;}
-        .bar-bg { width: 100%; height: 8px; background-color: var(--bg-color); border-radius: 4px; overflow: hidden; }
-        .bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease-out; }
-        .empty-state { text-align: center; padding: 30px 20px; color: var(--text-muted); font-size: 14px; }
-
-        /* Loader Overlay */
-        .loading-overlay { display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.8); z-index: 10; align-items: center; justify-content: center; font-weight: bold; color: var(--primary); border-radius: 16px; flex-direction: column; gap: 10px;}
-        .loading-overlay.active { display: flex; }
     </style>
 </head>
-<body>
+<body class="state-history">
 
 <header>
-    <div class="logo">
-        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-        ₹ Tracker
+    <div class="header-content">
+        <div class="logo">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            ₹ Tracker Pro
+        </div>
+        <div class="desktop-tabs">
+            <button class="tab-btn active" id="tab-transactions" onclick="setState('history')">Transactions</button>
+            <button class="tab-btn" id="tab-reports" onclick="setState('reports')">Reports</button>
+        </div>
     </div>
 </header>
 
-<div class="main-container">
-
-    <div id="history-view" class="view-section active">
-
-        <div class="sticky-summary">
-            <h3>Total Spent</h3>
-            <p class="huge-amount" id="totalAmount">₹0.00</p>
-        </div>
-
-        <div class="card-header-flex">
-            <h2>Transactions</h2>
-            <div class="action-btns-mini">
-                <input type="file" id="csvFileInput" accept=".csv" style="display:none;">
-                <button class="btn-mini" id="importBtn">Import</button>
-                <button class="btn-mini" id="exportBtn" style="background:var(--primary); color:white; border-color:var(--primary)">Export</button>
-            </div>
-        </div>
-
-        <div id="tableLoader" class="loading-overlay" style="position:fixed; z-index:999;"><span id="loaderText">Syncing...</span></div>
-
-        <div class="tx-list" id="expenseBody">
-            </div>
-    </div>
-
-    <div id="add-view" class="view-section">
-        <div class="card">
+<main>
+    <div class="transactions-wrapper">
+        
+        <div class="card form-card">
             <div id="formLoader" class="loading-overlay">Saving...</div>
-            <h2 id="formTitle">New Expense</h2>
+            <h2 id="formTitle">Add Expense</h2>
             <form id="expenseForm" class="form-group" style="margin-top: 10px;">
                 <div class="input-wrap"><label>Date</label><input type="date" id="date" required></div>
                 <div class="input-wrap"><label>Description</label><input type="text" id="desc" placeholder="What did you pay for?" required></div>
@@ -189,53 +216,90 @@
                     <datalist id="labelList"></datalist>
                 </div>
                 <div class="input-wrap"><label>Tags (Optional)</label><input type="text" id="tags" placeholder="e.g., trip, food"></div>
-
+                
                 <div class="form-actions">
-                    <button type="submit" id="submitBtn" class="add-btn">
-                        <span id="submitBtnText">Save Expense</span>
-                    </button>
+                    <button type="submit" id="submitBtn" class="add-btn"><span id="submitBtnText">Save</span></button>
                     <button type="button" id="cancelEditBtn" class="cancel-btn" onclick="cancelEdit()">Cancel</button>
                 </div>
             </form>
         </div>
+
+        <div class="card history-card">
+            <div id="tableLoader" class="loading-overlay" style="position:fixed; z-index:999;"><span id="loaderText">Loading Data...</span></div>
+            
+            <div class="report-summary-card mobile-only" style="padding: 15px; margin-bottom: 15px;">
+                <h3 style="font-size: 13px;">Total Spent</h3>
+                <p class="huge-amount" id="mobileTotalAmount" style="font-size: 26px;">₹0.00</p>
+            </div>
+
+            <div class="card-header-flex">
+                <h2>Transactions</h2>
+                <div class="action-btns-mini">
+                    <input type="file" id="csvFileInput" accept=".csv" style="display:none;">
+                    <button class="btn-mini" id="importBtn">Import CSV</button>
+                    <button class="btn-mini" id="exportBtn" style="background:var(--primary); color:white; border-color:var(--primary)">Export</button>
+                </div>
+            </div>
+
+            <div class="desktop-table-container">
+                <table id="expenseTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th><th>Description</th><th>Category</th><th>Source</th><th>Label</th><th>Tags</th>
+                            <th class="right-align">Amount</th><th style="text-align: center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="desktopTableBody"></tbody>
+                    <tfoot>
+                        <tr class="total-row">
+                            <td colspan="6" class="right-align">Total Spent:</td>
+                            <td id="desktopTotalAmount" class="right-align amount-text">₹0.00</td><td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <div class="mobile-cards-container" id="mobileCardsBody">
+                </div>
+        </div>
     </div>
 
-    <div id="reports-view" class="view-section">
+    <div class="reports-view">
         <div class="card">
             <div class="report-filters">
                 <div class="filter-group"><label>From</label><input type="date" id="reportStartDate"></div>
                 <div class="filter-group"><label>To</label><input type="date" id="reportEndDate"></div>
             </div>
             <div style="display:flex; gap:10px;">
-                <button class="btn-mini" style="flex:1; background:var(--primary); color:white;" onclick="generateReports()">Apply</button>
-                <button class="btn-mini" style="flex:1;" onclick="resetReportDates()">All Time</button>
+                <button class="btn-mini" style="flex:1; background:var(--primary); color:white; padding:12px;" onclick="generateReports()">Apply</button>
+                <button class="btn-mini" style="flex:1; padding:12px;" onclick="resetReportDates()">All Time</button>
             </div>
         </div>
 
-        <div class="sticky-summary" style="margin-top: 15px;">
+        <div class="report-summary-card" style="margin-top: 15px;">
             <h3>Period Spending</h3>
             <p class="huge-amount" id="reportTotalAmount">₹0.00</p>
         </div>
 
         <div class="report-grid">
-            <div class="card"><h2 style="margin-bottom:15px; font-size:16px;">By Category</h2><div id="categoryReport"></div></div>
-            <div class="card"><h2 style="margin-bottom:15px; font-size:16px;">By Source</h2><div id="sourceReport"></div></div>
-            <div class="card"><h2 style="margin-bottom:15px; font-size:16px;">By Label</h2><div id="labelReport"></div></div>
+            <div class="card"><h2>By Category</h2><div id="categoryReport"></div></div>
+            <div class="card"><h2>By Source</h2><div id="sourceReport"></div></div>
+            <div class="card"><h2>By Label</h2><div id="labelReport"></div></div>
+            <div class="card"><h2>By Tags</h2><div id="tagReport"></div></div>
         </div>
     </div>
-
-</div>
+</main>
 
 <nav class="bottom-nav">
-    <button class="nav-item active" id="nav-history" onclick="switchTab('history')">
+    <button class="nav-item active" id="nav-history" onclick="setState('history')">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
         <span>History</span>
     </button>
-    <button class="nav-item fab-btn" id="nav-add" onclick="switchTab('add')">
+    <button class="nav-item fab-btn" id="nav-add" onclick="setState('add')">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
         <span style="margin-top:4px;">Add</span>
     </button>
-    <button class="nav-item" id="nav-reports" onclick="switchTab('reports')">
+    <button class="nav-item" id="nav-reports" onclick="setState('reports')">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>
         <span>Reports</span>
     </button>
@@ -243,70 +307,71 @@
 
 <script>
     // ==========================================
-    // SUPABASE CONFIGURATION (REQUIRED)
+    // STATE & NAVIGATION MANAGER
+    // ==========================================
+    function setState(stateName) {
+        // 1. Set Body Class to trigger CSS media queries
+        document.body.className = `state-${stateName}`;
+        
+        // 2. Update Mobile Bottom Nav Icons
+        document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+        if(document.getElementById('nav-' + stateName)) {
+            document.getElementById('nav-' + stateName).classList.add('active');
+        }
+
+        // 3. Update Desktop Top Nav Tabs
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        if (stateName === 'history' || stateName === 'add') {
+            document.getElementById('tab-transactions').classList.add('active');
+        } else if (stateName === 'reports') {
+            document.getElementById('tab-reports').classList.add('active');
+            if(!document.getElementById('reportStartDate').value) setDefaultReportDates();
+            generateReports();
+        }
+
+        // 4. Smooth Focus on Mobile Add
+        if(stateName === 'add' && window.innerWidth < 768) {
+            setTimeout(() => document.getElementById('desc').focus(), 100);
+        }
+
+        window.scrollTo(0, 0); // Reset scroll to top
+    }
+
+    // ==========================================
+    // SUPABASE CONFIGURATION
     // ==========================================
     let supabaseClient;
     let expenses = []; 
     let currentEditId = null; 
     
-    let dbCategories = [];
-    let dbSources = [];
-    let dbLabels = [];
+    let dbCategories = [], dbSources = [], dbLabels = [];
 
     const form = document.getElementById('expenseForm');
-    const tableBody = document.getElementById('expenseBody');
-    const totalAmountSpan = document.getElementById('totalAmount');
+    const desktopTableBody = document.getElementById('desktopTableBody');
+    const mobileCardsBody = document.getElementById('mobileCardsBody');
     const loaderText = document.getElementById('loaderText');
 
-    // ==========================================
-    // INITIALIZATION
-    // ==========================================
     async function initApp() {
         try {
-            // Fetch credentials dynamically from Vercel API Route
+            // Fetch configuration from Vercel Serverless Function
             const response = await fetch('/api/config');
             if (!response.ok) throw new Error("Failed to fetch config");
-
+            
             const config = await response.json();
             supabaseClient = supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
-             document.getElementById('date').valueAsDate = new Date();
 
-            // Pull initial configurations and data from database
+            document.getElementById('date').valueAsDate = new Date();
+            
             await fetchDropdownData();
             await fetchExpenses();
         } catch (error) {
             console.error(error);
-            alert("Application failed to initialize. Please verify your Vercel Environment Variables and /api config.js setup.");
+            alert("App failed to initialize. Check Vercel Environment Variables and /api/config.js.");
         }
     }
 
     // ==========================================
-    // UI NAVIGATION LOGIC (Mobile Tabs)
-    // ==========================================
-    function switchTab(tabName) {
-        // Update Nav Icons
-        document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
-        document.getElementById('nav-' + tabName).classList.add('active');
-
-        // Update Views
-        document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
-        document.getElementById(tabName + '-view').classList.add('active');
-
-        // Logic routing
-        if (tabName === 'history') {
-            // No extra action needed
-        } else if (tabName === 'reports') {
-            if(!document.getElementById('reportStartDate').value) setDefaultReportDates();
-            generateReports();
-        } else if (tabName === 'add') {
-            // Focus the description input slightly after transition for smooth UI
-            setTimeout(() => document.getElementById('desc').focus(), 100);
-        }
-        window.scrollTo(0, 0); // Reset scroll position on tab change
-    }
-
-    // ==========================================
-    // DATABASE: DROPDOWN OPTIONS
+    // DROPDOWNS & DB SYNC
     // ==========================================
     async function fetchDropdownData() {
         const [catRes, srcRes, lblRes] = await Promise.all([
@@ -326,8 +391,7 @@
         const catSelect = document.getElementById('category');
         const srcSelect = document.getElementById('source');
         
-        const currentCat = catSelect.value;
-        const currentSrc = srcSelect.value;
+        const currentCat = catSelect.value, currentSrc = srcSelect.value;
 
         catSelect.innerHTML = '<option value="" disabled selected>Select category...</option>';
         dbCategories.forEach(c => catSelect.insertAdjacentHTML('beforeend', `<option value="${c}">${c}</option>`));
@@ -350,15 +414,12 @@
             const newVal = prompt(`Enter new ${type} name:`);
             if (newVal && newVal.trim() !== "") {
                 const trimmed = newVal.trim();
-                
                 if (!array.includes(trimmed)) {
                     document.getElementById('formLoader').classList.add('active');
                     const { error } = await supabaseClient.from(tableName).insert([{ name: trimmed }]);
                     document.getElementById('formLoader').classList.remove('active');
-                    
                     if (!error) array.push(trimmed);
                 }
-
                 populateDropdowns();
                 e.target.value = trimmed;
             } else { e.target.value = ""; }
@@ -369,12 +430,13 @@
     document.getElementById('source').addEventListener('change', e => handleAddNew(e, 'source', dbSources, 'payment_sources'));
 
     // ==========================================
-    // DATABASE: EXPENSES CRUD
+    // EXPENSES CRUD
     // ==========================================
     async function fetchExpenses() {
+        loaderText.textContent = "Loading Data...";
         document.getElementById('tableLoader').classList.add('active');
         const { data, error } = await supabaseClient.from('expenses').select('*').order('date', { ascending: false });
-        if (!error) { expenses = data || []; renderCards(); }
+        if (!error) { expenses = data || []; renderData(); }
         document.getElementById('tableLoader').classList.remove('active');
     }
 
@@ -391,11 +453,12 @@
             tags: document.getElementById('tags').value.trim()
         };
 
-        if (expensePayload.category === "addNew" || expensePayload.category === "") return alert("Please select a category.");
-        if (expensePayload.source === "addNew" || expensePayload.source === "") return alert("Please select a source.");
+        if (expensePayload.category === "addNew" || !expensePayload.category) return alert("Please select a category.");
+        if (expensePayload.source === "addNew" || !expensePayload.source) return alert("Please select a source.");
 
         document.getElementById('formLoader').classList.add('active');
 
+        // Dynamically memorize label
         if (expensePayload.label && !dbLabels.includes(expensePayload.label)) {
             await supabaseClient.from('labels').insert([{ name: expensePayload.label }]);
             dbLabels.push(expensePayload.label);
@@ -407,10 +470,10 @@
             if (!error) cancelEdit(); else alert("Error updating.");
         } else {
             const { error } = await supabaseClient.from('expenses').insert([expensePayload]);
-            if (!error) {
-                form.reset();
-                document.getElementById('date').valueAsDate = new Date();
-                switchTab('history'); // Automatically jump back to list after saving
+            if (!error) { 
+                form.reset(); 
+                document.getElementById('date').valueAsDate = new Date(); 
+                setState('history'); // Jump back to list
             } else alert("Error saving.");
         }
         
@@ -419,7 +482,8 @@
     });
 
     async function deleteExpense(id) {
-        if(confirm("Delete this expense?")) {
+        if(confirm("Are you sure you want to delete this expense?")) {
+            loaderText.textContent = "Deleting...";
             document.getElementById('tableLoader').classList.add('active');
             const { error } = await supabaseClient.from('expenses').delete().eq('id', id);
             if (!error) { if (currentEditId === id) cancelEdit(); await fetchExpenses(); }
@@ -428,49 +492,70 @@
     }
 
     // ==========================================
-    // MOBILE CARD RENDER LOGIC
+    // UNIFIED RENDER LOGIC (Fills Table & Cards)
     // ==========================================
-    function renderCards() {
-        tableBody.innerHTML = '';
+    function renderData() {
+        desktopTableBody.innerHTML = '';
+        mobileCardsBody.innerHTML = '';
         let total = 0;
 
         if(expenses.length === 0) {
-            tableBody.innerHTML = `<div class="empty-state">No transactions yet. Tap Add to get started!</div>`;
+            const emptyHtml = `<div class="empty-state">No transactions yet. Click Add to get started!</div>`;
+            desktopTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 40px;">No transactions yet.</td></tr>`;
+            mobileCardsBody.innerHTML = emptyHtml;
+            document.getElementById('desktopTotalAmount').textContent = '₹0.00';
+            document.getElementById('mobileTotalAmount').textContent = '₹0.00';
+            return;
         }
 
         expenses.forEach(exp => {
             total += Number(exp.amount);
+            
+            let tagsHtml = exp.tags ? exp.tags.split(',').filter(t=>t.trim()).map(t => `<span class="tag-pill">#${t.trim()}</span>`).join('') : '';
+            let labelHtml = exp.label ? `<span class="badge badge-label">${exp.label}</span>` : `<span style="color:#aaa;">-</span>`;
+            let formattedAmount = `₹${Number(exp.amount).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+            
+            // 1. Build Desktop Table Row
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${exp.date}</td><td style="font-weight: 500;">${exp.description}</td>
+                <td><span class="badge badge-category">${exp.category || 'N/A'}</span></td>
+                <td><span class="badge badge-source">${exp.source || 'N/A'}</span></td>
+                <td>${labelHtml}</td><td>${tagsHtml}</td>
+                <td class="right-align amount-text">${formattedAmount}</td>
+                <td>
+                    <div class="action-cell">
+                        <button class="action-btn edit-btn" onclick="editExpense(${exp.id})" title="Edit">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        </button>
+                        <button class="action-btn delete-btn" onclick="deleteExpense(${exp.id})" title="Delete">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </div>
+                </td>
+            `;
+            desktopTableBody.appendChild(tr);
 
-            // Build visual tags
-            let pillsHtml = '';
-            if (exp.category) pillsHtml += `<span class="tx-pill cat">${exp.category}</span>`;
-            if (exp.source) pillsHtml += `<span class="tx-pill src">${exp.source}</span>`;
-            if (exp.label) pillsHtml += `<span class="tx-pill">${exp.label}</span>`;
-            if (exp.tags && exp.tags.trim() !== '') {
-                exp.tags.split(',').filter(t=>t.trim()).forEach(t => {
-                    pillsHtml += `<span class="tx-pill tag">#${t.trim()}</span>`;
-                });
-            }
-
-            const formattedDate = new Date(exp.date).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'});
-
+            // 2. Build Mobile Card
+            let mobilePillsHtml = '';
+            if (exp.category) mobilePillsHtml += `<span class="badge badge-category">${exp.category}</span>`;
+            if (exp.source) mobilePillsHtml += `<span class="badge badge-source">${exp.source}</span>`;
+            if (exp.label) mobilePillsHtml += `<span class="badge badge-label">${exp.label}</span>`;
+            if (exp.tags) exp.tags.split(',').filter(t=>t.trim()).forEach(t => mobilePillsHtml += `<span class="tag-pill">#${t.trim()}</span>`);
+            
+            const fmtDate = new Date(exp.date).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'});
+            
             const card = document.createElement('div');
             card.className = 'tx-card';
             card.innerHTML = `
                 <div class="tx-top">
                     <div style="flex:1;">
                         <div class="tx-title">${exp.description}</div>
-                        <div class="tx-meta">
-                            <span>${formattedDate}</span>
-                        </div>
+                        <div class="tx-meta"><span>${fmtDate}</span></div>
                     </div>
-                    <div class="tx-amount">₹${Number(exp.amount).toLocaleString('en-IN', {minimumFractionDigits: 2})}</div>
+                    <div class="tx-amount">${formattedAmount}</div>
                 </div>
-
-                <div class="tx-meta" style="margin-top: 2px;">
-                    ${pillsHtml}
-                </div>
-
+                <div class="tx-meta" style="margin-top: 2px;">${mobilePillsHtml}</div>
                 <div class="tx-bottom">
                     <div class="tx-actions">
                         <button class="tx-btn edit" onclick="editExpense(${exp.id})">
@@ -482,39 +567,41 @@
                     </div>
                 </div>
             `;
-            tableBody.appendChild(card);
+            mobileCardsBody.appendChild(card);
         });
-        totalAmountSpan.textContent = `₹${total.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+        const finalTotal = `₹${total.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        document.getElementById('desktopTotalAmount').textContent = finalTotal;
+        document.getElementById('mobileTotalAmount').textContent = finalTotal;
     }
 
     function editExpense(id) {
         const exp = expenses.find(e => e.id === id);
         if (!exp) return;
-
         ['date','description','amount','category','source','tags'].forEach(k => {
             const el = document.getElementById(k === 'description' ? 'desc' : k);
             if(el) el.value = exp[k] || '';
         });
         document.getElementById('labelInput').value = exp.label || '';
-
+        
         currentEditId = id;
         document.getElementById('formTitle').textContent = "Edit Expense";
         document.getElementById('submitBtn').classList.add('edit-mode');
-        document.getElementById('submitBtnText').textContent = "Update Expense";
+        document.getElementById('submitBtnText').textContent = "Update";
         document.getElementById('cancelEditBtn').style.display = 'block';
-
-        switchTab('add'); // Automatically jump to the Add Form tab
+        
+        setState('add'); // Triggers mobile tab switch, or just scrolls to top on Desktop
     }
 
     function cancelEdit() {
         currentEditId = null;
         form.reset();
         document.getElementById('date').valueAsDate = new Date();
-        document.getElementById('formTitle').textContent = "New Expense";
+        document.getElementById('formTitle').textContent = "Add Expense";
         document.getElementById('submitBtn').classList.remove('edit-mode');
-        document.getElementById('submitBtnText').textContent = "Save Expense";
+        document.getElementById('submitBtnText').textContent = "Save";
         document.getElementById('cancelEditBtn').style.display = 'none';
-        switchTab('history');
+        setState('history');
     }
 
     // ==========================================
@@ -575,7 +662,6 @@
             if (bulkCategories.size > 0 || bulkSources.size > 0 || bulkLabels.size > 0) await fetchDropdownData();
 
             const { error } = await supabaseClient.from('expenses').insert(newExpenses);
-            
             if (error) { alert("Database Error."); console.error(error); } 
             else { alert(`Imported ${newExpenses.length} expenses!`); await fetchExpenses(); }
 
@@ -590,8 +676,7 @@
         for (let i = 0; i < text.length; i++) {
             let char = text[i];
             if (char === '"') {
-                if (inQuotes && text[i+1] === '"') { val += '"'; i++; }
-                else { inQuotes = !inQuotes; }
+                if (inQuotes && text[i+1] === '"') { val += '"'; i++; } else { inQuotes = !inQuotes; }
             } else if (char === ',' && !inQuotes) { row.push(val); val = ''; } 
             else if ((char === '\n' || char === '\r') && !inQuotes) {
                 if (char === '\r' && text[i+1] === '\n') i++; 
@@ -611,29 +696,32 @@
         document.getElementById('reportEndDate').value = lastDay.toISOString().split('T')[0];
     }
     function resetReportDates() { document.getElementById('reportStartDate').value = ''; document.getElementById('reportEndDate').value = ''; generateReports(); }
-
+    
     function generateReports() {
         const start = document.getElementById('reportStartDate').value, end = document.getElementById('reportEndDate').value;
         let filteredData = expenses;
         if (start) filteredData = filteredData.filter(e => e.date >= start);
         if (end) filteredData = filteredData.filter(e => e.date <= end);
-
+        
         const total = filteredData.reduce((sum, e) => sum + Number(e.amount), 0);
         document.getElementById('reportTotalAmount').textContent = `₹${total.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
-
-        const byCategory = {}, bySource = {}, byLabel = {};
+        
+        const byCategory = {}, bySource = {}, byLabel = {}, byTag = {};
         filteredData.forEach(exp => {
             const amt = Number(exp.amount);
             byCategory[exp.category || 'Uncategorized'] = (byCategory[exp.category || 'Uncategorized'] || 0) + amt;
             bySource[exp.source || 'Unknown'] = (bySource[exp.source || 'Unknown'] || 0) + amt;
             byLabel[exp.label || 'No Label'] = (byLabel[exp.label || 'No Label'] || 0) + amt;
+            if (exp.tags && exp.tags.trim() !== '') { exp.tags.split(',').forEach(tag => { let t = tag.trim(); if(t) byTag[t] = (byTag[t] || 0) + amt; }); } 
+            else { byTag['No Tags'] = (byTag['No Tags'] || 0) + amt; }
         });
-
+        
         renderBreakdown('categoryReport', byCategory, total, ['#8b5cf6', '#a78bfa', '#c4b5fd']);
         renderBreakdown('sourceReport', bySource, total, ['#f97316', '#fb923c', '#fdba74']);
         renderBreakdown('labelReport', byLabel, total, ['#10b981', '#34d399', '#6ee7b7']);
+        renderBreakdown('tagReport', byTag, total, ['#0ea5e9', '#38bdf8', '#7dd3fc']);
     }
-
+    
     function renderBreakdown(containerId, dataObj, total, colors) {
         const container = document.getElementById(containerId);
         if (Object.keys(dataObj).length === 0 || total === 0) return container.innerHTML = '<div class="empty-state">No data available.</div>';
